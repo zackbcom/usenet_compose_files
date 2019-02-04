@@ -1,0 +1,33 @@
+# watchtower compose file
+#
+# https://github.com/v2tec/watchtower
+# https://hub.docker.com/r/v2tec/watchtower
+#
+# A process for watching your Docker containers and automatically
+# restarting them whenever their base image is refreshed.
+#
+# 20190125 - scottjl - first official file
+
+version: '3.6'
+
+networks:
+    default:
+        external:
+            name: appstack
+
+services:
+    watchtower:
+        container_name: watchtower
+        restart: always
+        volumes:
+            - '/var/run/docker.sock:/var/run/docker.sock'
+        image: v2tec/watchtower:latest
+        command: --schedule "0 0 1 * * *" --cleanup --label-enable
+        labels:
+            - "traefik.enable=false"
+            - "com.centurylinklabs.watchtower.enable=true"
+        logging:
+            driver: "json-file"
+            options:
+                max-size: "200k"
+                max-file: "10"

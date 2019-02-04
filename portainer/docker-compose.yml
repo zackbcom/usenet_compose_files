@@ -1,0 +1,45 @@
+# portainer compose file
+#
+# https://www.portainer.io/
+# https://hub.docker.com/r/portainer/portainer
+#
+# Portainer is a lightweight management UI which allows you to easily
+# manage your Docker host or Swarm cluster.
+#
+# 20190203 - scottjl - first official file
+
+version: '3.6'
+
+volumes:
+    portainer_data:
+        driver: local
+        name: portainer_data
+
+networks:
+    default:
+        external:
+            name: appstack
+
+services:
+    portainer:
+        container_name: portainer
+        restart: unless-stopped
+        volumes:
+            - 'portainer_data:/data'
+            - '/var/run/docker.sock:/var/run/docker.sock'
+# uncomment if you want to directly expose portainer
+#         ports:
+#             - '9000:9000'
+        image: portainer/portainer
+        labels:
+            - "com.centurylinklabs.watchtower.enable=true"
+            - "traefik.docker.network=appstack"
+            - "traefik.enable=true"
+            - "traefik.frontend.passHostHeader=true"
+            - "traefik.frontend.rule=Host:${SERVER_HOST};PathPrefixStrip: /portainer"
+            - "traefik.port=9000"
+        logging:
+            driver: "json-file"
+            options:
+                max-size: "200k"
+                max-file: "10"

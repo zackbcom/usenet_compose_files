@@ -1,0 +1,51 @@
+# traefik compose file
+#
+# https://traefik.io/
+# https://hub.docker.com/_/traefik
+#
+# Traefik is a modern HTTP reverse proxy and load balancer
+# that makes deploying microservices easy.
+#
+# 20190203 - scottjl - first official file
+
+version: '3.6'
+
+networks:
+    appstack:
+        driver: bridge
+        name: appstack
+        ipam:
+            driver: default
+
+services:
+    traefik:
+        container_name: traefik
+        restart: on-failure
+        image: traefik
+        command: --api --docker
+        ports:
+            - "80:80"
+            - "443:443"
+# uncomment if you want direct access to the traefik dashboard
+#            - "8080:8080"
+        volumes:
+            - '/var/run/docker.sock:/var/run/docker.sock:ro'
+            - '/opt/docker/traefik/traefik.toml:/traefik.toml'
+            - '/opt/docker/traefik/appstack.json:/appstack.json'
+# this uses a single wildcard certificate
+            - '/opt/docker/traefik/cert1.pem:/cert.pem'
+            - '/opt/docker/traefik/privkey1.pem:/privkey.pem'
+        labels:
+            - "com.centurylinklabs.watchtower.enable=true" # allow watchtower upates
+            - "traefik.docker.network=appstack"
+            - "traefik.enable=true"
+            - "traefik.frontend.rule=Host:${SERVER_HOST};PathPrefixStrip: /traefik"
+            - "traefik.frontend.auth.basic.users=/opt/docker/traefik/.htpasswd"
+            - "traefik.port=8080"
+        networks:
+            - appstack
+        logging:
+            driver: "json-file"
+            options:
+                max-size: "200k"
+                max-file: "10"
