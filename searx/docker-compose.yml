@@ -1,0 +1,44 @@
+# searx compose file
+#
+# https://github.com/asciimoo/searx
+# https://hub.docker.com/r/hoellen/searx
+#
+# Searx is a metasearch engine, inspired by the seeks project. It provides
+# basic privacy by mixing your queries with searches on other platforms
+# without storing search data. Queries are made using a POST request on every
+# browser (except chrome). Therefore they show up in neither our logs, nor
+# your url history. In case of Chrome users there is an exception, Searx
+# uses the search bar to perform GET requests. Searx can be added to your
+# browser's search bar; moreover, it can be set as the default search engine.
+#
+# 20190205 - scottjl - first official file
+
+version: '3.6'
+
+networks:
+    default:
+        external:
+            name: appstack
+
+services:
+    searx:
+        container_name: searx
+        restart: always
+        environment:
+            - BASE_URL="https://searx.yourdomain.com"
+            - IMAGE_PROXY=True
+        image: hoellen/searx:latest
+        labels:
+            - "com.centurylinklabs.watchtower.enable=true"
+            - "traefik.docker.network=appstack"
+            - "traefik.enable=true"
+            - "traefik.frontend.rule=Host:searx.yourdomain.com"
+            - "traefik.port=8888"
+            - "traefik.protocol=http"
+            - "traefik.frontend.entryPoints=https"
+            - "traefik.frontend.passHostHeader=true"
+        logging:
+            driver: "json-file"
+            options:
+                max-size: "200k"
+                max-file: "10"

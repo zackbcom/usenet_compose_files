@@ -1,0 +1,55 @@
+# mysql compose file
+#
+# https://minio.io/
+# https://hub.docker.com/r/minio/minio
+#
+# Minio is an object storage server released under Apache License v2.0.
+# It is compatible with Amazon S3 cloud storage service. It is best suited
+# for storing unstructured data such as photos, videos, log files, backups
+# and container / VM images. Size of an object can range from a few KBs to
+# a maximum of 5TB.
+#
+# 20190205 - scottjl - first official file
+
+version: '3.6'
+
+volumes:
+    minio_data:
+        driver: local
+        name: minio_data
+    minio_config:
+        driver: local
+        name: minio_config
+
+networks:
+    default:
+        external:
+            name: appstack
+
+services:
+    minio:
+        container_name: minio
+        restart: always
+        volumes:
+            - 'minio_data:/data'
+            - 'minio_config:/root/.minio'
+        environment:
+            - MINIO_ACCESS_KEY=${ACCESS_KEY}
+            - MINIO_SECRET_KEY=${SECRET_KEY}
+# uncomment below to expose port
+#         ports:
+#             - '9000:9000'
+        image: minio/minio
+        command: server /data
+        labels:
+            - "com.centurylinklabs.watchtower.enable=true"
+            - "traefik.enable=true"
+            - "traefik.frontend.rule=Host:minio.coldmoon.net"
+            - "traefik.frontend.passHostHeader=true"
+            - "traefik.port=9000"
+            - "traefik.protocol=http"
+        logging:
+            driver: "json-file"
+            options:
+                max-size: "200k"
+                max-file: "10"
