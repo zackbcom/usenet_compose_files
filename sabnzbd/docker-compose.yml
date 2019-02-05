@@ -1,0 +1,54 @@
+# mysql compose file
+#
+# https://sabnzbd.org/ 
+# https://hub.docker.com/r/linuxserver/sabnzbd
+#
+# SABnzbd makes Usenet as simple and streamlined as possible by automating
+# everything we can. All you have to do is add an .nzb. SABnzbd takes over
+# from there, where it will be automatically downloaded, verified, repaired,
+# extracted and filed away with zero human interaction.
+#
+# 20190125 - scottjl - first official file
+
+version: '3.6'
+
+volumes:
+    sabnzbd_data:
+        driver: local
+        name: sabnzbd_data
+        labels:
+            - "net.coldmoon.bertha=sabnzbd_data"
+
+networks:
+    default:
+        external:
+            name: coldmoon.net
+
+services:
+    sabnzbd:
+        container_name: sabnzbd
+        restart: unless-stopped
+        volumes:
+            - 'sabnzbd_data:/datadir'
+            - '/mnt/transfer/usenet:/usenet'
+            - '/tmp/sabnzbd:/tmp/sabnzbd'
+            - '/mnt/transfer/sabnzbd:/sabnzbd_work'
+        environment:
+            - SABNZBD_UID=2001
+            - SABNZBD_GID=2001
+        ports:
+            - 9080:8080
+        image: sabnzbd/sabnzbd
+        labels:
+            - "net.coldmoon.bertha=sabnzbd"
+            - "com.centurylinklabs.watchtower.enable=true"
+            - "traefik.docker.network=coldmoon.net"
+            - "traefik.enable=true"
+            - "traefik.frontend.rule=Host:bertha.coldmoon.net;PathPrefix: /sabnzbd"
+            - "traefik.port=8080"
+            - "traefik.frontend.passHostHeader=true"
+        logging:
+            driver: "json-file"
+            options:
+                max-size: "200k"
+                max-file: "10"

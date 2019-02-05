@@ -1,0 +1,52 @@
+# nzbget compose file
+#
+# https://nzbget.net/
+# https://hub.docker.com/r/linuxserver/nzbget
+#
+# NZBGet is a usenet downloader, written in C++ and designed with performance
+# in mind to achieve maximum download speed by using very little system resources.
+#
+# 20190203 - scottjl - first official file
+
+version: '3.6'
+
+volumes:
+    nzbget_data:
+        driver: local
+        name: nzbget_data
+
+networks:
+    default:
+        external:
+            name: appstack
+
+services:
+    nzbget:
+        container_name: nzbget
+        restart: unless-stopped
+        volumes:
+            - './config:/config'
+            - './nzbget:/nzbget'
+            - '/mnt/transfer/usenet:/usenet'
+            - '/tmp/nzbget/inter:/downloads/inter'
+            - '/tmp/nzbget/tmp:/downloads/tmp'
+        environment:
+            - PGID=${PGID}
+            - PUID=${PUID}
+            - TZ=${TZ_DATA}
+# uncomment if you want to directly expose nzbgetd
+#         ports:
+#             - '6789:6789'
+        image: linuxserver/nzbget
+        labels:
+            - "com.centurylinklabs.watchtower.enable=true"
+            - "traefik.docker.network=appstack"
+            - "traefik.enable=true"
+            - "traefik.frontend.rule=Host:${SERVER_HOST};PathPrefix: /nzbget"
+            - "traefik.frontend.passHostHeader=true"
+            - "traefik.port=6789"
+        logging:
+            driver: "json-file"
+            options:
+                max-size: "200k"
+                max-file: "10"
