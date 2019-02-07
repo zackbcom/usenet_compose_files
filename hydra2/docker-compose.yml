@@ -1,0 +1,50 @@
+# nzbhydra2 compose file
+#
+# https://github.com/linuxserver/docker-hydra2
+# https://hub.docker.com/r/linuxserver/hydra2
+#
+# NZBHydra 2 is a meta search application for NZB indexers, the "spiritual
+# successor" to NZBmegasearcH, and an evolution of the original application
+#  NZBHydra . It provides easy access to a number of raw and newznab based indexers.
+#
+# 20190207 - scottjl - first official file
+
+version: '3.6'
+
+volumes:
+    hydra2_data:
+        driver: local
+        name: hydra2_data
+
+networks:
+    default:
+        external:
+            name: appstack
+
+services:
+    hydra2:
+        container_name: hydra2
+        restart: unless-stopped
+        volumes:
+            - 'hydra2_data:/config'
+            - '/mnt/transfer/usenet:/downloads'
+            - '/mnt/transfer/transmission/watch:/watch'
+        environment:
+            - PGID=2001
+            - PUID=2001
+            - TZ=America/Chicago
+#         ports:
+#             - '5076:5076'
+        image: linuxserver/hydra2
+        labels:
+            - "net.coldmoon.bertha=hydra2"
+            - "traefik.docker.network=appstack"
+            - "traefik.enable=true"
+# set url base to /hydra2
+            - "traefik.frontend.rule=Host:${SERVER_HOST};PathPrefix: /hydra2"
+            - "traefik.port=5076"
+        logging:
+            driver: "json-file"
+            options:
+                max-size: "200k"
+                max-file: "10"
