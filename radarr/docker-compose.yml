@@ -1,0 +1,48 @@
+# mysql compose file
+#
+# https://github.com/Radarr/Radarr
+# https://hub.docker.com/r/linuxserver/radarr
+#
+# Radarr - A fork of Sonarr to work with movies à la Couchpotato.
+#
+# 20190207 - scottjl - first official file
+
+version: '3.6'
+
+volumes:
+    radarr_data:
+        driver: local
+        name: radarr_data
+
+networks:
+    default:
+        external:
+            name: appstack
+
+services:
+    radarr:
+        container_name: radarr
+        restart: unless-stopped
+        volumes:
+            - '/etc/localtime:/etc/localtime:ro'
+            - 'radarr_data:/config'
+            - '/media/movies:/movies'
+            - '/mnt/transfer/usenet:/usenet'
+        environment:
+            - PGID=2001
+            - PUID=2001
+            - TZ=America/Chicago
+#        ports:
+#            - 7878:7878
+        image: linuxserver/radarr
+        labels:
+            - "com.centurylinklabs.watchtower.enable=true"
+            - "traefik.docker.network=appstack'
+            - "traefik.enable=true"
+            - "traefik.frontend.rule=Host:${SERVER_HOST};PathPrefix: /radarr"
+            - "traefik.port=7878"
+        logging:
+            driver: "json-file"
+            options:
+                max-size: "200k"
+                max-file: "10"
