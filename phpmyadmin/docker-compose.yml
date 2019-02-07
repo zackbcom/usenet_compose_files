@@ -1,0 +1,39 @@
+# phpmyadmin compose file
+#
+# https://www.phpmyadmin.net/
+# https://hub.docker.com/r/phpmyadmin/phpmyadmin
+#
+# A web interface for MySQL and MariaDB. 
+#
+# 20190207 - scottjl - first official file
+
+# *** I do not recommend keeping this container running when you
+# *** aren't actively using it!!!
+
+version: '3.6'
+
+networks:
+    default:
+        external:
+            name: appstack
+
+services:
+    phpmyadmin:
+        container_name: phpmyadmin
+        restart: "no"
+        environment:
+            - PGID=2001
+            - PUID=2001
+            - PMA_ARBITRARY=1
+            - PMA_HOST=mariadb
+# this is exposed on your server!
+        ports:
+            - '7880:80'
+        image: phpmyadmin/phpmyadmin:latest
+        labels:
+            - "com.centurylinklabs.watchtower.enable=true"
+            - "traefik.enable=false"
+        logging:
+            driver: "json-file"
+            options:
+                max-size: "200k"
