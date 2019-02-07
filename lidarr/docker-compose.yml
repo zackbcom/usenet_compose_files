@@ -1,0 +1,51 @@
+# lidarr compose file
+#
+# https://github.com/lidarr/Lidarr 
+# https://hub.docker.com/r/linuxserver/lidarr
+#
+# Lidarr is a music collection manager for Usenet and BitTorrent users.
+# It can monitor multiple RSS feeds for new tracks from your favorite artists
+# and will grab, sort and rename them. It can also be configured to
+# automatically upgrade the quality of files already downloaded when a better
+# quality format becomes available.
+#
+# 20190207 - scottjl - first official file
+
+version: '3.6'
+
+volumes:
+    lidarr_data:
+        driver: local
+        name: lidarr_data
+
+networks:
+    default:
+        external:
+            name: appstack
+
+services:
+    lidarr:
+        container_name: lidarr
+        restart: unless-stopped
+        volumes:
+            - 'lidarr_data:/config'
+            - '/media/music/usenet:/music'
+            - '/mnt/transfer/usenet:/usenet'
+        environment:
+            - PGID=2001
+            - PUID=2001
+            - TZ=America/Chicago
+#         ports:
+#             - '8686:8686'
+        image: linuxserver/lidarr
+        labels:
+            - "com.centurylinklabs.watchtower.enable=true"
+            - "traefik.docker.network=appstack"
+            - "traefik.enable=true"
+            - "traefik.frontend.rule=Host:${SERVER_HOST};PathPrefix: /lidarr"
+            - "traefik.port=8686"
+        logging:
+            driver: "json-file"
+            options:
+                max-size: "200k"
+                max-file: "10"
