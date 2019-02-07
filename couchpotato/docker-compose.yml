@@ -1,0 +1,50 @@
+# couchpotato compose file
+#
+# https://couchpota.to/
+# https://hub.docker.com/r/linuxserver/couchpotato
+#
+# Couchpotato is an automatic NZB and torrent downloader. You can keep a
+# movies I want list and it will search for NZBs/torrents of these movies
+# every X hours. Once a movie is found, it will send it to SABnzbd or
+# download the torrent to a specified directory.
+#
+# 20190207 - scottjl - first official file
+
+version: '3.6'
+
+volumes:
+    couchpotato_data:
+        driver: local
+        name: couchpotato_data
+
+networks:
+    default:
+        external:
+            name: ppstack
+
+services:
+    couchpotato:
+        container_name: couchpotato
+        restart: always
+        volumes:
+            - 'couchpotato_data:/config'
+            - '/media/movies:/movies'
+            - '/mnt/transfer/usenet/movies:/usenet'
+        environment:
+            - PGID=2001
+            - PUID=2001
+            - TZ=America/Chicago
+#         ports:
+#             - '5050:5050'
+        image: linuxserver/couchpotato
+        labels:
+            - "com.centurylinklabs.watchtower.enable=true"
+            - "traefik.docker.network=appstack"
+            - "traefik.enable=true"
+            - "traefik.frontend.rule=Host:${SERVER_HOST};PathPrefix: /couchpotato"
+            - "traefik.port=5050"
+        logging:
+            driver: "json-file"
+            options:
+                max-size: "200k"
+                max-file: "10"
