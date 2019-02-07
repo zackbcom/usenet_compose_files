@@ -1,0 +1,50 @@
+# sonarr compose file
+#
+# https://sonarr.tv/
+# https://hub.docker.com/r/linuxserver/sonarr
+#
+# Sonarr (formerly NZBdrone) is a PVR for usenet and bittorrent users.
+# It can monitor multiple RSS feeds for new episodes of your favorite shows
+# and will grab, sort and rename them. It can also be configured to
+# automatically upgrade the quality of files already downloaded when a better
+# quality format becomes available.
+#
+# 20190207 - scottjl - first official file
+
+version: '3.6'
+
+volumes:
+    sonarr_data:
+        driver: local
+        name: sonarr_data
+
+networks:
+    default:
+        external:
+            name: appstack
+
+services:
+    sonarr:
+        container_name: sonarr
+        restart: unless-stopped
+        volumes:
+            - '/etc/localtime:/etc/localtime:ro'
+            - 'sonarr_data:/config'
+            - '/media/series:/tv'
+            - '/mnt/transfer/usenet:/usenet'
+        environment:
+            - PGID=2001
+            - PUID=2001
+            - TZ=America/Chicago
+        image: linuxserver/sonarr
+        labels:
+            - "com.centurylinklabs.watchtower.enable=true"
+            - "traefik.docker.network=appstack'
+            - "traefik.enable=true"
+            - "traefik.frontend.rule=Host:${SERVER_HOST};PathPrefix: /sonarr"
+            - "traefik.port=8989"
+        logging:
+            driver: "json-file"
+            options:
+                max-size: "200k"
+                max-file: "10"

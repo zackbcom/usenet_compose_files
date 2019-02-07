@@ -1,0 +1,51 @@
+# mariadb compose file
+#
+# https://mariadb.org/
+# https://hub.docker.com/_/mariadb
+#
+# MariaDB is a community-developed fork of the MySQL relational database
+# management system intended to remain free under the GNU GPL. Being a fork
+# of a leading open source software system, it is notable for being led by
+# the original developers of MySQL, who forked it due to concerns over its
+# acquisition by Oracle. Contributors are required to share their copyright
+# with the MariaDB Foundation.
+#
+# 20190207 - scottjl - first official file
+
+version: '3.6'
+
+volumes:
+    mariadb_data:
+        driver: local
+        name: mariadb_data
+
+networks:
+    default:
+        external:
+            name: appstack
+
+services:
+    mariadb:
+        container_name: mariadb
+        restart: always
+        volumes:
+            - 'mariadb_data:/var/lib/mysql'
+#            - './my.cnf:/etc/mysql/conf.d/my.cnf'
+        environment:
+            - PGID=2001
+            - PUID=2001
+            - 'MYSQL_ROOT_PASSWORD=${ROOT_PASSWORD}'
+# expose port if you want to use for non-docker applications
+#         ports:
+#             - '3306:3306'
+        image: mariadb
+        labels:
+# do NOT auto-update this image
+            - "com.centurylinklabs.watchtower.enable=false"
+            - "traefik.docker.network=appstack"
+            - "traefik.enable=false"
+        logging:
+            driver: "json-file"
+            options:
+                max-size: "200k"
+                max-file: "10"
