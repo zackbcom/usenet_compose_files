@@ -1,0 +1,49 @@
+# calibre-web compose file
+#
+# https://github.com/janeczku/calibre-web
+# https://hub.docker.com/r/linuxserver/calibre-web
+#
+# Calibre-Web is a web app providing a clean interface for browsing,
+# reading and downloading eBooks using an existing Calibre database.
+#
+# 20190207 - scottjl - first official file
+
+version: '3.6'
+
+volumes:
+    calibre-web_data:
+        driver: local
+        name: calibre_data
+
+networks:
+    default:
+        external:
+            name: appstack
+
+services:
+    calibre-web:
+        container_name: calibre-web
+        restart: unless-stopped
+        volumes:
+            - 'calibre-web_data:/config'
+            - '/path_to/Calibre_Library:/books'
+        environment:
+            - PGID=2001
+            - PUID=2001
+            - TZ=America/Chicago
+        image: linuxserver/calibre-web
+#        ports:
+#            - '8083:8083'
+        labels:
+            - "com.centurylinklabs.watchtower.enable=true"
+            - "traefik.docker.network=appstack"
+            - "traefik.enable=true"
+            - "traefik.frontend.rule=Host:${SERVER_HOST};PathPrefix: /calibre-web"
+            - "traefik.frontend.headers.customRequestHeaders=x-script-name:/calibre-web"
+            - "traefik.port=8083"
+            - "traefik.frontend.passHostHeader=true"
+        logging:
+            driver: "json-file"
+            options:
+                max-size: "200k"
+                max-file: "10"

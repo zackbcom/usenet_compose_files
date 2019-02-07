@@ -33,7 +33,7 @@ services:
             - '/opt/docker/traefik/traefik.toml:/traefik.toml'
             - '/opt/docker/traefik/appstack.json:/appstack.json'
 # this uses a single wildcard certificate
-            - '/etc/letsencrypt/live/${LE_KEY}/cert.pem:/cert.pem'
+            - '/etc/letsencrypt/live/${LE_KEY}/fullchain.pem:/cert.pem'
             - '/etc/letsencrypt/live/${LE_KEY}/privkey.pem:/privkey.pem'
         labels:
             - "com.centurylinklabs.watchtower.enable=true"
