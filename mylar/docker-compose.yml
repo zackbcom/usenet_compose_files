@@ -1,0 +1,49 @@
+# mylar compose file
+#
+# https://github.com/evilhero/mylar
+# https://hub.docker.com/r/linuxserver/mylar
+#
+# A automated Comic Book downloader (cbr/cbz) for use with SABnzbd, NZBGet
+# and torrents.
+#
+# 20190207 - scottjl - first official file
+
+version: '3.6'
+
+volumes:
+    mylar_data:
+        driver: local
+        name: mylar_data
+
+networks:
+    default:
+        external:
+            name: appstack
+
+services:
+    mylar:
+        container_name: mylar
+        restart: unless-stopped
+        volumes:
+            - 'mylar_data:/config'
+            - '/mnt/transfer/usenet:/usenet'
+            - '/media/comics:/comics'
+            - '/mnt/transfer/import/mylar:/import'
+        environment:
+            - PGID=2001
+            - PUID=2001
+            - TZ=America/Chicago
+#        ports:
+#            - '8090:8090'
+        image: linuxserver/mylar
+        labels:
+            - "com.centurylinklabs.watchtower.enable=true"
+            - "traefik.docker.network=appstack"
+            - "traefik.enable=true"
+            - "traefik.frontend.rule=Host:${SERVER_HOST};PathPrefix: /mylar"
+            - "traefik.port=8090"
+        logging:
+            driver: "json-file"
+            options:
+                max-size: "200k"
+                max-file: "10"

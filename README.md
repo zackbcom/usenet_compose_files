@@ -9,3 +9,5 @@ I have multiple applications for some services, like nzbget and sabnzbd, couchpo
 # things to look for
 
 .env file - SERVER_HOST should be your FQDN of your server, example: _server.domain.com_ It will be used by traefik and all of the servers.
+
+You also need to set up a path prefix in the configuration for most of these applications. Where/how to do that will vary, but look for something referring to "reverse proxy path" or the like and use "/application" or whatever you specify in the compose file.
