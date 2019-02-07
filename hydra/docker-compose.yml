@@ -1,0 +1,48 @@
+# nzbhydra compose file
+#
+# https://github.com/theotherp/nzbhydra
+# https://hub.docker.com/r/linuxserver/hydra
+#
+# NZBHydra is a meta search for NZB indexers and the "spiritual successor"
+# to NZBmegasearcH. It provides easy access to a number of raw and newznab
+# based indexers.
+#
+# 20190207 - scottjl - first official file
+
+version: '3.6'
+
+volumes:
+    hydra_data:
+        driver: local
+        name: hydra_data
+
+networks:
+    default:
+        external:
+            name: appstack
+
+services:
+    hydra:
+        container_name: hydra
+        restart: unless-stopped
+        volumes:
+            - 'hydra_data:/config'
+            - '/mnt/transfer/usenet:/downloads'
+        environment:
+            - PGID=2001
+            - PUID=2001
+            - TZ=America/Chicago
+#        ports:
+#            - '5075:5075'
+        image: linuxserver/hydra
+        labels:
+            - "traefik.docker.network=appstack"
+            - "traefik.enable=true"
+# set url base to /hydra
+            - "traefik.frontend.rule=Host:${SERVER_HOST};PathPrefix: /hydra"
+            - "traefik.port=5075"
+        logging:
+            driver: "json-file"
+            options:
+                max-size: "200k"
+                max-file: "10"
