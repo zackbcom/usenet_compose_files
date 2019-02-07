@@ -1,0 +1,49 @@
+# tautulli compose file
+#
+# https://github.com/tautulli/tautulli
+# https://hub.docker.com/r/tautulli/tautulli
+#
+# Tautulli integrates with Plex to provide you a feature-rich dashboard
+# of statistics from user activity to a graphical history of streams,
+# play count, along with configurable notifications, and more.
+#
+# 20190207 - scottjl - first official file
+
+# This compose assumes you are already running my plex instance as well.
+# If not you may need to change the location of the log directory.
+
+version: '3.6'
+
+volumes:
+    tautulli_data:
+        driver: local
+        name: tautulli_data
+
+networks:
+    default:
+        external:
+            name: appstack
+
+services:
+    tautulli:
+        container_name: tautulli
+        restart: unless-stopped
+        volumes:
+            - 'tautulli_data:/config'
+            - '/var/lib/docker/volumes/plex_data/_data/Library/Application Support/Plex Media Server/Logs:/logs:ro'
+        environment:
+            - PGID=2001
+            - PUID=2001
+            - TZ=America/Chicago
+        image: tautulli/tautulli
+        labels:
+            - "com.centurylinklabs.watchtower.enable=true"
+            - "traefik.docker.network=appstack"
+            - "traefik.enable=true"
+            - "traefik.frontend.rule=Host:${SERVER_HOST};PathPrefix: /tautulli"
+            - "traefik.port=8181"
+        logging:
+            driver: "json-file"
+            options:
+                max-size: "200k"
+                max-file: "10"

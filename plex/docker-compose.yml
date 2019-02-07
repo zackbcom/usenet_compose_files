@@ -1,0 +1,47 @@
+# plex compose file
+#
+# https://www.plex.tv
+# https://hub.docker.com/r/plexinc/pms-docker
+#
+# With our easy-to-install Plex Media Server software and your Plex apps,
+# available on all your favorite phones, tablets, streaming devices, gaming
+# consoles, and smart TVs, you can stream your video, music, and photo
+# collections any time, anywhere, to any device.
+#
+# 20190207 - scottjl - first official file
+
+version: '3.6'
+
+volumes:
+    plex_data:
+        driver: local
+        name: plex_data
+
+networks:
+    default:
+        external:
+            name: appstack
+
+services:
+    plex:
+        container_name: plex
+        restart: always
+        volumes:
+            - 'plex_data:/config'
+            - '/tmp/plex:/transcode'
+            - '/media:/media'
+        environment:
+            - TZ=America/Chicago
+            - PLEX_CLAIM="${PLEX_CLAIM}"
+            - ALLOWED_NETWORKS='10.0.0.0/8'
+        network_mode: "host"
+        image: plexinc/pms-docker
+        labels:
+            - "net.coldmoon.bertha=plex"
+            - "com.centurylinklabs.watchtower.enable=true"
+            - "traefik.enable=false"
+        logging:
+            driver: "json-file"
+            options:
+                max-size: "200k"
+                max-file: "10"
