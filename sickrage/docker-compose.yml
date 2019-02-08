@@ -1,0 +1,47 @@
+# sickrage compose file
+#
+# https://sickrage.ca/
+# https://hub.docker.com/r/linuxserver/sickrage
+#
+# Automatic Video Library Manager for TV Shows. It watches for new episodes
+# of your favorite shows, and when they are posted it does its magic.
+#
+# 20190208 - scottjl - first official file
+
+version: '3.6'
+
+volumes:
+    sickrage_data:
+        driver: local
+        name: sickrage_data
+
+networks:
+    default:
+        external:
+            name: appstack
+
+services:
+    sickrage:
+        container_name: sickrage
+        restart: unless-stopped
+        volumes:
+            - 'sickrage_data:/config'
+            - '/mnt/transfer/usenet:/downloads'
+            - '/media/series:/tv'
+        environment:
+            - PGID=2001
+            - PUID=2001
+            - TZ=America/Chicago
+#        ports:
+#            - '8081:8081'
+        image: linuxserver/sickrage
+        labels:
+            - "traefik.docker.network=appstack"
+            - "traefik.enable=true"
+            - "traefik.frontend.rule=Host:${SERVER_HOST};PathPrefix: /sickrage"
+            - "traefik.port=8081"
+        logging:
+            driver: "json-file"
+            options:
+                max-size: "200k"
+                max-file: "10"
