@@ -1,0 +1,43 @@
+# apache compose file
+
+# https://projects.apache.org/project.html?httpd-http_server
+# https://hub.docker.com/_/httpd
+
+# The Apache HTTP Server, colloquially called Apache,
+# is a Web server application notable for playing a key
+# role in the initial growth of the World Wide Web.
+#
+# 20190208 - scottjl - first official file
+
+# uncomment httpd.conf if you want to use your own configuration file
+# uncomment ports if you want direct exposure to local network
+
+version: '3.6'
+
+networks:
+    default:
+        external:
+            name: appstack
+
+services:
+    apache2:
+        container_name: apache2
+        restart: unless-stopped
+        volumes:
+            - '/var/www/html:/usr/local/apache2/htdocs'
+#            - './httpd.conf:/usr/local/apache2/conf/httpd.conf'
+#        ports:
+#            - '80:80'
+#            - '443:443'
+        image: httpd
+        labels:
+            - "com.centurylinklabs.watchtower.enable=true"
+            - "traefik.docker.network=appstack'
+            - "traefik.enable=true"
+            - "traefik.frontend.rule=Host:${SERVER_HOST}"
+            - "traefik.port=80"
+        logging:
+            driver: "json-file"
+            options:
+                max-size: "200k"
+                max-file: "10"
