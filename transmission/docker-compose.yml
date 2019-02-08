@@ -1,0 +1,62 @@
+# transmission compose file
+#
+# https://transmissionbt.com/
+# https://hub.docker.com/r/haugene/transmission-openvpn
+#
+# This container contains OpenVPN and Transmission with a configuration
+# where Transmission is running only when OpenVPN has an active tunnel. It
+# bundles configuration files for many popular VPN providers to make the
+# setup easier.
+#
+# 20190207 - scottjl - first official file
+
+# *** This compose file requires a lot more configuraiton than most. Please
+# *** see the hub.docker.com web page for more information.
+
+version: '3.6'
+
+networks:
+    transmission:
+        driver: bridge
+        name: transmission
+        ipam:
+            driver: default
+
+services:
+    transmission:
+        container_name: transmission
+        devices:
+            - /dev/net/tun
+        restart: unless-stopped
+        cap_add:
+            - NET_ADMIN
+        volumes:
+            - '/etc/localtime:/etc/localtime:ro'
+            - '/mnt/transfer/transmission:/data'
+        environment:
+            - PGID=2001
+            - PUID=2001
+            - TZ=America/Chicago
+            - OPENVPN_PROVIDER=${VPN_PROVIDER}
+            - 'OPENVPN_CONFIG=${VPN_CONFIG}'
+            - 'OPENVPN_USERNAME=${VPN_USER}'
+            - 'OPENVPN_PASSWORD=${VPN_PASS}'
+            - LOCAL_NETWORK=${LOCAL_NET}
+            - WEBPROXY_ENABLED=true
+            - WEBPROXY_PORT=8888
+        ports:
+            - '9091:9091'
+            - '42424:42424'
+        image: haugene/transmission-openvpn
+        networks:
+            - transmission
+        labels:
+            - "com.centurylinklabs.watchtower.enable=true"
+            - "traefik.enable=false"
+        dns:
+            - 1.1.1.1
+        logging:
+            driver: "json-file"
+            options:
+                max-size: "10m"
+                max-file: "10"
