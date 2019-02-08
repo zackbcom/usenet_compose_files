@@ -1,0 +1,49 @@
+# headphones compose file
+#
+# https://github.com/rembo10/headphones
+# https://hub.docker.com/r/linuxserver/headphones
+#
+# headphones is an automated music downloader for NZB and Torrent,
+# written in Python. It supports SABnzbd, NZBget, Transmission, µTorrent
+# and Blackhole.
+#
+# 20190208 - scottjl - first official file
+
+version: '3.6'
+
+volumes:
+    headphones_data:
+        driver: local
+        name: headphones_data
+
+networks:
+    default:
+        external:
+            name: appstack
+
+services:
+    headphones:
+        container_name: headphones
+        restart: unless-stopped
+        volumes:
+            - 'headphones_data:/config'
+            - '/media/music/usenet:/music'
+            - '/mnt/transfer/usenet:/downloads'
+        environment:
+            - PGID=2001
+            - PUID=2001
+            - TZ=America/Chicago
+#        ports:
+#            - '8181:8181'
+        image: linuxserver/headphones
+        labels:
+            - "com.centurylinklabs.watchtower.enable=true"
+            - "traefik.docker.network=appstack"
+            - "traefik.enable=true"
+            - "traefik.frontend.rule=Host:${SERVER_HOST};PathPrefix: /headphones"
+            - "traefik.port=8181"
+        logging:
+            driver: "json-file"
+            options:
+                max-size: "200k"
+                max-file: "10"
