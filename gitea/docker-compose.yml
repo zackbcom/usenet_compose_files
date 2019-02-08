@@ -1,0 +1,54 @@
+# gitea compose file
+#
+# https://gitea.io/
+# https://hub.docker.com/r/gitea/gitea
+#
+# A painless self-hosted Git service.
+#
+# 20190208 - scottjl - first official file
+
+# *** Note, gitea doesn't work with a proxy suffix, so you need to
+# *** give it a domain prefix to function properly.
+# ***
+# *** gitea also needs a database set up for it, you can use my mariadb
+# *** or mysql containers just fine. use the phpmyadmin container to
+# *** set up the user if needed.
+# *** 
+# *** The web page can be served through traefik, but the ssh connection
+# *** needs to be exposed, unless you aren't allowing ssh. Also note it
+# *** is on port 3022 as to not conflict with host ssh.
+
+version: '3.6'
+
+volumes:
+    gitea_data:
+        driver: local
+        name: gitea_data
+
+networks:
+    default:
+        external:
+            name: appstack
+
+services:
+    gitea:
+        container_name: gitea
+        restart: unless-stopped
+        image: gitea/gitea
+        volumes:
+            - 'gitea_data:/data'
+        ports:
+            - "3022:22"
+#            - "3000:3000"
+        labels:
+            - "com.centurylinklabs.watchtower.enable=true"
+            - "traefik.docker.network=appstack"
+            - "traefik.enable=true"
+            - "traefik.frontend.rule=Host:gitea.${SERVER_DOMAIN}"
+            - "traefik.port=3000"
+        logging:
+            driver: "json-file"
+            options:
+                max-size: "200k"
+                max-file: "10"
+
