@@ -1,0 +1,87 @@
+# minecraft compose file
+#
+# https://minecraft.net
+# https://hub.docker.com/r/itzg/minecraft-server
+#
+# This docker image provides a Minecraft Server that will automatically
+# download the latest stable version at startup. You can also run/upgrade
+# to any specific version or the latest snapshot. See the Versions section
+# below for more information.
+#
+# 20190208 - scottjl - first official file
+
+# *** this will start a basic minecraft server. there are A LOT of options
+# *** you can set and I recommend reading the hub.docker.com page to
+# *** understand them all.
+# *** memory requirements may need to be adjusted.
+# *** watchdog auto-update is disabled.
+
+version: '2.4'
+
+volumes:
+    minecraft_data:
+        driver: local
+        name: minecraft_data
+
+networks:
+    default:
+        external:
+            name: appstack
+
+services:
+    minecraft:
+        container_name: minecraft
+        restart: unless-stopped
+        image: itzg/minecraft-server
+        mem_limit: 4g
+        volumes:
+            - 'minecraft_data:/data'
+        environment:
+            - UID=2001
+            - GID=2001
+            - EULA=TRUE
+#            - TYPE=FORGE
+            - MEMORY=4G
+#            - DIFFICULTY=normal
+#            - OPS=scottjl
+#            - ENABLE_RCON=TRUE
+#            - RCON_PASSWORD=set_a_password
+#            - RCON_PORT=25575
+#            - ENABLE_QUERY=true
+#            - QUERY_PORT=25565
+#            - MAX_PLAYERS=10
+#            - MAX_WORLD_SIZE=10000
+#            - ALLOW_NETHER=true
+#            - ANNOUNCE_PLAYER_ACHIEVEMENTS=true
+#            - ENABLE_COMMAND_BLOCK=true
+#            - FORCE_GAMEMODE=false
+#            - GENERATE_STRUCTURES=true
+#            - HARDCORE=false
+#            - SNOOPER_ENABLED=false
+#            - MAX_BUILD_HEIGHT=256
+#            - MAX_TICK_TIME=60000
+#            - SPAWN_ANIMALS=true
+#            - SPAWN_MONSTERS=true
+#            - SPAWN_NPCS=true
+#            - VIEW_DISTANCE=10
+#            - MODE=survival
+#            - "MOTD=Welcome to Minecraft!"
+#            - PVP=false
+#            - ONLINE_MODE=true
+#            - ALLOW_FLIGHT=false
+#            - SEED=12345678
+#            - "WHITELIST=user1,user2"
+#            - "OPS=user1,user2"
+        ports:
+            - "25565:25565"
+        tty: true
+        stdin_open: true
+        labels:
+            - "com.centurylinklabs.watchtower.enable=false"
+            - "traefik.enable=false"
+        logging:
+            driver: "json-file"
+            options:
+                max-size: "200k"
+                max-file: "10"
+
