@@ -1,0 +1,50 @@
+# ombi compose file
+#
+# https://ombi.io/
+# https://hub.docker.com/r/linuxserver/ombi
+#
+# Ombi allows you to host your own Plex Request and user management system.
+# If you are sharing your Plex server with other users, allow them to
+# request new content using an easy to manage interface! Manage all your
+# requests for Movies and TV with ease, leave notes for the user and get
+# notification when a user requests something. Allow your users to post
+# issues against their requests so you know there is a problem with the
+# audio etc. Even automatically send them weekly newsletters of new content
+# that has been added to your Plex server!
+#
+# 20190207 - scottjl - first official file
+
+version: '3.6'
+
+volumes:
+    ombi_data:
+        driver: local
+        name: ombi_data
+
+networks:
+    default:
+        external:
+            name: appstack
+
+services:
+    ombi:
+        container_name: ombi
+        restart: unless-stopped
+        volumes:
+            - 'ombi_data:/config'
+        environment:
+            - PGID=2001
+            - PUID=2001
+            - TZ=America/Chicago
+        image: linuxserver/ombi
+        labels:
+            - "com.centurylinklabs.watchtower.enable=true"
+            - "traefik.docker.network=appstack
+            - "traefik.enable=true"
+            - "traefik.frontend.rule=Host:${SERVER_HOST};PathPrefix: /ombi"
+            - "traefik.port=3579"
+        logging:
+            driver: "json-file"
+            options:
+                max-size: "200k"
+                max-file: "10"
