@@ -1,0 +1,49 @@
+# tt-rss compose file
+#
+# https://tt-rss.org/
+# https://hub.docker.com/r/linuxserver/tt-rss
+#
+# Tiny Tiny RSS is an open source web-based news feed (RSS/Atom) reader and
+# aggregator, designed to allow you to read news from any location, while
+# feeling as close to a real desktop application as possible.
+#
+# 20190208 - scottjl - first official file
+
+# *** Note, tt-rss doesn't work with a proxy suffix, so you need to
+# *** give it a domain prefix to function properly.
+
+version: '3.6'
+
+volumes:
+    tt-rss_data:
+        driver: local
+        name: tt-rss_data
+
+networks:
+    default:
+        external:
+            name: appstack
+
+services:
+    tt-rss:
+        container_name: tt-rss
+        restart: unless-stopped
+        volumes:
+            - '/etc/localtime:/etc/localtime:ro'
+            - 'tt-rss_data:/config'
+        environment:
+            - PGID=2001
+            - PUID=2001
+            - TZ=America/Chicago
+        image: linuxserver/tt-rss
+        labels:
+            - "com.centurylinklabs.watchtower.enable=true"
+            - "traefik.docker.network=appstack"
+            - "traefik.enable=true"
+            - "traefik.frontend.rule=Host:tt-rss.${SERVER_DOMAIN}"
+            - "traefik.port=80"
+        logging:
+            driver: "json-file"
+            options:
+                max-size: "200k"
+                max-file: "10"
