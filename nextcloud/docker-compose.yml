@@ -1,0 +1,64 @@
+# nextcloud compose file
+#
+# https://nextcloud.com/
+# https://hub.docker.com/_/nextcloud
+#
+# A safe home for all your data. Access & share your files, calendars,
+# contacts, mail & more from any device, on your terms.
+#
+# 20190125 - scottjl - first official file
+
+# *** Note, nextcloud doesn't work with a proxy suffix, so you need to
+# *** give it a domain prefix to function properly.
+# ***
+# *** nextcloud also needs a database set up for it, you can use my mariadb
+# *** or mysql containers just fine. use the phpmyadmin container to
+# *** set up the user if needed.
+# ***
+# *** Watchdog updating is disabled for this container as auto-updates could
+# *** cause problems. Please update the container manually.
+
+version: '3.6'
+
+volumes:
+    nextcloud_config:
+        driver: local
+        name: nextcloud_config
+    nextcloud_custom_apps:
+        driver: local
+        name: nextcloud_custom_apps
+    nextcloud_data:
+        driver: local
+        name: nextcloud_data
+    nextcloud_html:
+        driver: local
+        name: nextcloud_html
+
+networks:
+    default:
+        external:
+            name: appstack
+
+services:
+    nextcloud:
+        container_name: nextcloud
+        restart: unless-stopped
+        volumes:
+            - 'nextcloud_html:/var/www/html'
+            - 'nextcloud_config:/var/www/html/config'
+            - 'nextcloud_custom_apps:/var/www/html/custom_apps'
+            - 'nextcloud_data:/var/www/html/data'
+#        ports:
+#            - '9080:80'
+        image: nextcloud:15
+        labels:
+            - "com.centurylinklabs.watchtower.enable=false"
+            - "traefik.docker.network=appstack"
+            - "traefik.enable=true"
+            - "traefik.frontend.rule=Host:nextcloud.${SERVER_DOMAIN}"
+            - "traefik.port=80"
+        logging:
+            driver: "json-file"
+            options:
+                max-size: "200k"
+                max-file: "10"
