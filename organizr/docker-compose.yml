@@ -1,0 +1,48 @@
+# mysql compose file
+#
+# https://github.com/causefx/Organizr
+# https://hub.docker.com/r/lsiocommunity/organizr
+#
+# HTPC/Homelab Services Organizer - Written in PHP
+#
+# 20190125 - scottjl - first official file
+
+# *** Organizr doesn't proxy with a suffix so we need
+# *** to give it its own prefix.
+
+version: '3.6'
+
+volumes:
+    organizr_data:
+        driver: local
+        name: organizr_data
+
+networks:
+    default:
+        external:
+            name: appstack
+
+services:
+    organizr:
+        container_name: organizr
+        restart: unless-stopped
+        volumes:
+            - 'organizr_data:/config'
+        environment:
+            - PGID=2001
+            - PUID=2001
+        ports:
+            - '7380:80'
+        image: lsiocommunity/organizr
+        labels:
+            - "com.centurylinklabs.watchtower.enable=true"
+            - "traefik.docker.network=appstack"
+            - "traefik.enable=true"
+            - "traefik.frontend.rule=Host:organizr.${SERVER_DOMAIN}"
+            - "traefik.frontend.passHostHeader=true"
+            - "traefik.port=80"
+        logging:
+            driver: "json-file"
+            options:
+                max-size: "200k"
+                max-file: "10"
