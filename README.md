@@ -10,6 +10,8 @@ I prefer running one service per compose file. This way I can have better contro
 
 These compose files were built on a Linux server, they may or may not work properly on other operating systems, you are welcome to port them, but I only use Linux (Ubuntu 18.04 LTS).
 
+I try to use official images from the application when I can, or the amazing containers from the Linuxserver.io team, a few are from other well-maintained sources. I make no guaratees, warranty or assume liability for any of the images and you're certainly free to use others.
+
 # things to look for
 
 .env file - SERVER_HOST should be your FQDN of your server, example: _server.domain.com_ It will be used by traefik and all of the servers.
