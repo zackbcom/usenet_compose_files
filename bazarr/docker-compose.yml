@@ -8,7 +8,7 @@
 # You define your preferences by TV show or movies and Bazarr
 # takes care of everything for you.
 #
-# 20190124 - scottjl - first official file
+# 20190207 - scottjl - first official file
 
 version: '3.6'
 

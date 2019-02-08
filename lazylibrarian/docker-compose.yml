@@ -1,0 +1,53 @@
+# lazylibrarian compose file
+#
+# https://github.com/DobyTang/LazyLibrarian
+# https://hub.docker.com/r/linuxserver/lazylibrarian
+#
+# LazyLibrarian is a program to follow authors and grab metadata for all
+# your digital reading needs. It uses a combination of Goodreads Librarything
+# and optionally GoogleBooks as sources for author info and book info. This
+# container is based on the DobyTang fork.
+#
+# 20190207 - scottjl - first official file
+
+version: '3.6'
+
+volumes:
+    lazylibrarian_data:
+        driver: local
+        name: lazylibrarian_data
+
+networks:
+    default:
+        external:
+            name: appstack
+
+services:
+    lazylibrarian:
+        container_name: lazylibrarian
+        restart: unless-stopped
+        volumes:
+            - 'lazylibrarian_data:/config'
+            - '/media/ebooks:/books'
+            - '/media/audiobooks:/audiobooks'
+            - '/mnt/transfer/usenet:/usenet'
+            - '/mnt/transfer/import/lazylibrarian:/import'
+        environment:
+            - PGID=2001
+            - PUID=2001
+            - TZ=America/Chicago
+#         ports:
+#             - '5299:5299'
+        image: linuxserver/lazylibrarian
+        labels:
+            - "com.centurylinklabs.watchtower.enable=true"
+            - "traefik.docker.network=appstack"
+            - "traefik.enable=true"
+            - "traefik.frontend.rule=Host:${SERVER_HOST};PathPrefix: /lazylibrarian"
+            - "traefik.port=5299"
+            - "traefik.frontend.passHostHeader=true"
+        logging:
+            driver: "json-file"
+            options:
+                max-size: "200k"
+                max-file: "10"
