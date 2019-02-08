@@ -25,6 +25,8 @@ You need to set up a few paths. I store all my media in /media and downloads gen
 
 You will need to set up a path prefix in the configuration for most of these applications. Where/how to do that will vary, but look for something referring to "reverse proxy path" or the like and use "/application" or whatever you specify in the compose file. The easiest way is to first expose the port from the container, configure as needed, then remove the exposed port, or leave it open for direct access from your internal network.
 
+I chose not to use Traefik's authentication generally because some applications had issues with it, instead I rely on user management within each applicaiton, also some applications store settings and such per-user, such as NZBHydra2.
+
 # suggestions welcome
 
 These files work for me but they could be better, please feel free to suggest improvements and report problems.

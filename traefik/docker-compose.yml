@@ -8,6 +8,11 @@
 #
 # 20190203 - scottjl - first official file
 
+# *** You can secure this container with http basic login, be sure
+# *** htpasswd (apt install apache2-utils) is installed. You can add
+# *** users with:
+# *** htpasswd -b .htpasswd user password
+
 version: '3.6'
 
 networks:
