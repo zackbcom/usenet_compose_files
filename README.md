@@ -6,6 +6,8 @@ Note all of these applications assume that you're using my traefik compose file 
 
 I have multiple applications for some services, like nzbget and sabnzbd, couchpotato and radarr. I recommend only running _one_ application for each service at a time. Choice is good.
 
+I prefer running one service per compose file. This way I can have better control over what is running and what isn't. You can use portainer for web-based management, or combine what's in these files into consolidated files.
+
 # things to look for
 
 .env file - SERVER_HOST should be your FQDN of your server, example: _server.domain.com_ It will be used by traefik and all of the servers.
