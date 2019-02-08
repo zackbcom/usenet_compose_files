@@ -1,0 +1,51 @@
+# bazarr compose file
+#
+# https://github.com/morpheus65535/bazarr
+# https://hub.docker.com/r/linuxserver/bazarr
+#
+# Bazarr is a companion application to Sonarr and Radarr.
+# It manages and downloads subtitles based on your requirements.
+# You define your preferences by TV show or movies and Bazarr
+# takes care of everything for you.
+#
+# 20190124 - scottjl - first official file
+
+version: '3.6'
+
+volumes:
+    bazarr_data:
+        driver: local
+        name: bazarr_data
+
+networks:
+    default:
+        external:
+            name: appstack
+
+services:
+    bazarr:
+        container_name: bazarr
+        restart: unless-stopped
+        volumes:
+            - '/etc/localtime:/etc/localtime:ro'
+            - 'bazarr_data:/config'
+            - '/media/movies:/music'
+            - '/media/series:/tv'
+        environment:
+            - PGID=2001
+            - PUID=2001
+            - TZ=America/Chicago
+#         ports:
+#             - '6767:6767'
+        image: linuxserver/bazarr
+        labels:
+            - "com.centurylinklabs.watchtower.enable=true"
+            - "traefik.docker.network=appstack"
+            - "traefik.enable=true"
+            - "traefik.frontend.rule=Host:${SERVER_HOST};PathPrefix: /bazarr"
+            - "traefik.port=6767"
+        logging:
+            driver: "json-file"
+            options:
+                max-size: "200k"
+                max-file: "10"
