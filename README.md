@@ -8,6 +8,8 @@ I have multiple applications for some services, like nzbget and sabnzbd, couchpo
 
 I prefer running one service per compose file. This way I can have better control over what is running and what isn't. You can use portainer for web-based management, or combine what's in these files into consolidated files.
 
+These compose files were built on a Linux server, they may or may not work properly on other operating systems, you are welcome to port them, but I only use Linux (Ubuntu 18.04 LTS).
+
 # things to look for
 
 .env file - SERVER_HOST should be your FQDN of your server, example: _server.domain.com_ It will be used by traefik and all of the servers.
