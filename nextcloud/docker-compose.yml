@@ -6,7 +6,7 @@
 # A safe home for all your data. Access & share your files, calendars,
 # contacts, mail & more from any device, on your terms.
 #
-# 20190125 - scottjl - first official file
+# 20190208 - scottjl - first official file
 
 # *** Note, nextcloud doesn't work with a proxy suffix, so you need to
 # *** give it a domain prefix to function properly.
