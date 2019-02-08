@@ -13,3 +13,7 @@ I prefer running one service per compose file. This way I can have better contro
 .env file - SERVER_HOST should be your FQDN of your server, example: _server.domain.com_ It will be used by traefik and all of the servers.
 
 You also need to set up a path prefix in the configuration for most of these applications. Where/how to do that will vary, but look for something referring to "reverse proxy path" or the like and use "/application" or whatever you specify in the compose file.
+
+# suggestions welcome
+
+These files work for me but they could be better, please feel free to suggest improvements and report problems.
