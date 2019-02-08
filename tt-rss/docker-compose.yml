@@ -11,6 +11,10 @@
 
 # *** Note, tt-rss doesn't work with a proxy suffix, so you need to
 # *** give it a domain prefix to function properly.
+# ***
+# *** tt-rss also needs a database set up for it, you can use my mariadb
+# *** or mysql containers just fine. use the phpmyadmin container to
+# *** set up the user if needed.
 
 version: '3.6'
 

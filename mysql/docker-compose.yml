@@ -1,0 +1,51 @@
+# mysql compose file
+#
+# https://www.mysql.com/
+# https://hub.docker.com/_/mysql
+#
+# MySQL is the world's most popular open source database. With its proven
+# performance, reliability and ease-of-use, MySQL has become the leading
+# database choice for web-based applications, covering the entire range
+# from personal projects and websites, via e-commerce and information
+# services, all the way to high profile web properties including Facebook,
+# Twitter, YouTube, Yahoo! and many more.
+#
+# 20190208 - scottjl - first official file
+
+# *** Uncomment my.cnf if you want to use your own configuration file
+# *** Uncomment ports if you want to expose this instance outside of docker.
+
+version: '3.6'
+
+volumes:
+    mysql_data:
+        driver: local
+        name: mysql_data
+
+networks:
+    default:
+        external:
+            name: appstack
+
+services:
+    mysql:
+        container_name: mysql
+        restart: unless-stopped
+        volumes:
+            - 'mysql_data:/var/lib/mysql'
+#            - './my.cnf:/etc/mysql/mysql.conf.d/my_options.cnf'
+        environment:
+            - PGID=2001
+            - PUID=2001
+            - 'MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASS}'
+#        ports:
+#            - '3306:3306'
+        image: mysql:5.6
+        labels:
+            - "com.centurylinklabs.watchtower.enable=false"
+            - "traefik.enable=false"
+        logging:
+            driver: "json-file"
+            options:
+                max-size: "200k"
+                max-file: "10"
