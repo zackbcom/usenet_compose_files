@@ -1,0 +1,46 @@
+# deluge compose file
+#
+# https://deluge-torrent.org/
+# https://hub.docker.com/r/linuxserver/deluge
+#
+# Deluge is a lightweight, Free Software, cross-platform BitTorrent client.
+#
+# 20190124 - scottjl - first official fileversion: '3.6'
+
+volumes:
+    deluge_data:
+        driver: local
+        name: deluge_data
+
+networks:
+    default:
+        external:
+            name: appstack
+
+services:
+    deluge:
+        container_name: deluge
+        restart: unless-stopped
+        volumes:
+            - 'deluge_data:/config'
+            - '/mnt/transfer/deluge:/downloads'
+        environment:
+            - PGID=2001
+            - PUID=2001
+            - TZ=America/Chicago
+            - UMASK_SET=022
+#         ports:
+#             - '8112:8112'
+        network_mode: "host"
+        image: linuxserver/deluge
+        labels:
+            - "traefik.docker.network=appstack"
+            - "traefik.enable=true"
+            - "traefik.frontend.rule=Host:${SERVER_HOST};PathPrefix: /deluge"
+            - "traefik.frontend.headers.customRequestHeaders=X-Deluge-Base:/deluge/"
+            - "traefik.port=8112"
+        logging:
+            driver: "json-file"
+            options:
+                max-size: "200k"
+                max-file: "10"
