@@ -42,7 +42,7 @@ services:
         labels:
             - "traefik.docker.network=appstack"
             - "traefik.enable=true"
-            - "traefik.frontend.rule=Host:znc.coldmoon.net"
+            - "traefik.frontend.rule=Host:znc.${SERVER_DOMAIN}"
             - "traefik.port=6501"
         logging:
             driver: "json-file"
