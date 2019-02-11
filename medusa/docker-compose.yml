@@ -1,0 +1,50 @@
+# medusa compose file
+#
+# https://github.com/pymedusa/Medusa
+# https://hub.docker.com/r/linuxserver/medusa
+#
+# Medusa, automatic Video Library Manager for TV Shows. It watches for new
+# episodes of your favorite shows, and when they are posted it does its magic.
+#
+# 20190211 - scottjl - first official file
+
+version: '3.6'
+
+volumes:
+    medusa_data:
+        driver: local
+        name: medusa_data
+
+networks:
+    default:
+        external:
+            name: appstack
+
+services:
+    medusa:
+        container_name: medusa
+        restart: unless-stopped
+        volumes:
+            - 'medusa_data:/config'
+            - '/media/series:/tv'
+            - '/mnt/transfer/usenet:/downloads'
+        environment:
+            - PGID=2001
+            - PUID=2001
+            - TZ=America/Chicago
+#         ports:
+#             - '8081:8081'
+        image: linuxserver/medusa
+        labels:
+            - "net.coldmoon.bertha=medusa"
+            - "com.centurylinklabs.watchtower.enable=true"
+            - "traefik.docker.network=coldmoon.net"
+            - "traefik.enable=true"
+# set HTTP web root to /medusa
+            - "traefik.frontend.rule=Host:${SERVER_HOST};PathPrefix: /medusa"
+            - "traefik.port=8081"
+        logging:
+            driver: "json-file"
+            options:
+                max-size: "200k"
+                max-file: "10"
