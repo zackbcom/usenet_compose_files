@@ -1,0 +1,51 @@
+# znc compose file
+#
+# https://wiki.znc.in/ZNC
+# https://hub.docker.com/r/linuxserver/znc
+#
+# ZNC is an IRC network bouncer or BNC. It can detach the client from the
+# actual IRC server, and also from selected channels. Multiple clients from
+# different locations can connect to a single ZNC account simultaneously and
+# therefore appear under the same nickname on IRC.
+
+#
+# 20190211 - scottjl - first official file
+
+# *** Note, znc doesn't work with a proxy suffix, so you need to
+# *** give it a domain prefix to function properly.
+
+version: '3.6'
+
+volumes:
+    znc_data:
+        driver: local
+        name: znc_data
+
+networks:
+    default:
+        external:
+            name: appstack
+
+services:
+    znc:
+        container_name: znc
+        restart: unless-stopped
+        volumes:
+            - 'znc_data:/config'
+        environment:
+            - PGID=2001
+            - PUID=2001
+            - TZ=America/Chicago
+        ports:
+            - '6501:6501'
+        image: linuxserver/znc
+        labels:
+            - "traefik.docker.network=appstack"
+            - "traefik.enable=true"
+            - "traefik.frontend.rule=Host:znc.coldmoon.net"
+            - "traefik.port=6501"
+        logging:
+            driver: "json-file"
+            options:
+                max-size: "200k"
+                max-file: "10"
