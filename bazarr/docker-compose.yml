@@ -29,7 +29,7 @@ services:
         volumes:
             - '/etc/localtime:/etc/localtime:ro'
             - 'bazarr_data:/config'
-            - '/media/movies:/music'
+            - '/media/movies:/movies'
             - '/media/series:/tv'
         environment:
             - PGID=2001
